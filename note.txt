@@ -1,0 +1,29 @@
+define ROOT C:\Program Files (x86)\nxlog
+
+Moduledir %ROOT%\modules
+CacheDir %ROOT%\data
+SpoolDir %ROOT%\data
+LogFile %ROOT%\data\nxlog.log
+<Extension _syslog>
+    Module      xm_syslog
+</Extension>
+
+<Input cacti_access_log>
+    Module      im_file
+    File        'C:\\Users\\cacti\\log\\access.log'
+    SavePos     TRUE
+    ReadFromLast TRUE
+    PollInterval 1
+    Exec        $Message = $raw_event;
+</Input>
+
+<Output siglens>
+    Module      om_udp
+    Host        IP_SIEM
+    Port        514
+    Exec        to_syslog_bsd();
+</Output>
+
+<Route cacti_to_siglens>
+    Path        cacti_access_log => siglens
+</Route>
